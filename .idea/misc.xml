@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_add_card.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_scan.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_store_cards.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/grid_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/recycler_item.xml" value="0.25416666666666665" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">BarCard.io</string>
+    <string name="name">Name</string>
+    <string name="number">Number</string>
+    <string name="store">Store</string>
+    <string name="code_type">Code type</string>
+    <string name="save">Save</string>
+    <string name="priv">Do not share</string>
+    <string name="invalid_data">Invalid data</string>
+    <string name="scan">Scan</string>
+    <string name="camera_not_granted">Camera permission has not been granted</string>
+    <string name="sound_disabled">Sound disabled</string>
+    <string name="sound_enabled">Sound enabled</string>
+    <string name="vibration_disabled">Vibration disabled</string>
+    <string name="vibration_enabled">Vibration enabled</string>
+    <string name="delete">Delete</string>
+    <string name="you_sure">Are you sure?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+</resources>
