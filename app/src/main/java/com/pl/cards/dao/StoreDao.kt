@@ -7,7 +7,7 @@ import com.pl.cards.model.Store
 @Dao
 interface StoreDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(store: Store)
 
     @Update
@@ -16,6 +16,7 @@ interface StoreDao {
     @Delete
     fun delete(store: Store)
 
-    @Query("SELECT * FROM store ORDER BY name ASC")
+    @Query("SELECT * FROM store WHERE (SELECT COUNT(*) FROM card WHERE card.store = store.id) > 0 ORDER BY name ASC")
     fun getAllStores(): LiveData<List<Store>>
+
 }

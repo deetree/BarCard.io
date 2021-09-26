@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
@@ -22,8 +23,7 @@ import com.pl.cards.R
 import com.pl.cards.helper.BarcodeHelper
 import com.pl.cards.helper.StoresTemplate
 import com.pl.cards.viewmodel.CardViewModel
-import com.pl.cards.viewmodel.StoreViewModel
-import kotlin.math.roundToInt
+import java.lang.IllegalArgumentException
 
 class ShowCardActivity : AppCompatActivity() {
 
@@ -48,7 +48,7 @@ class ShowCardActivity : AppCompatActivity() {
         val cardViewModel = ViewModelProvider(this).get(CardViewModel::class.java)
         val card = cardViewModel.getCard(cardId)
 
-        val store = StoresTemplate().storesArray.first { s -> s.id == card.store }
+        val store = StoresTemplate().storesList.first { s -> s.id == card.store }
 
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
@@ -61,7 +61,11 @@ class ShowCardActivity : AppCompatActivity() {
         setLogoSize(width, height)
         setCardSize(width, height)
 
-        displayBitmap(card.value, card.type, width, height / 5 * 3)
+        try {
+            displayBitmap(card.value, card.type, width, height / 5 * 3)
+        } catch(e: IllegalArgumentException) {
+            Toast.makeText(this, getString(R.string.cannot_generate), Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun setLogoSize(width: Int, height: Int) {

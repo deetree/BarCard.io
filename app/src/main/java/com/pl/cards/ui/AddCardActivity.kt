@@ -4,24 +4,24 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout.END_ICON_NONE
 import com.pl.cards.R
 import com.pl.cards.helper.BarcodeHelper
+import com.pl.cards.helper.StoresTemplate
 import com.pl.cards.model.Card
 import com.pl.cards.viewmodel.CardViewModel
-import com.pl.cards.viewmodel.StoreViewModel
 import java.security.SecureRandom
 
 class AddCardActivity : AppCompatActivity() {
@@ -34,20 +34,24 @@ class AddCardActivity : AppCompatActivity() {
     private var type: String = ""
     private var card: Card? = null
 
+    private lateinit var numberTIL: TextInputLayout
     private lateinit var numberET: TextInputEditText
+    private lateinit var storesDropdown: MaterialAutoCompleteTextView
+    private lateinit var storeTIL: TextInputLayout
     private lateinit var typeDropdown: MaterialAutoCompleteTextView
+    private lateinit var typeTIL: TextInputLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_card)
 
-        val storeViewModel = ViewModelProvider(this).get(StoreViewModel::class.java)
-
         val nameET = findViewById<TextInputEditText>(R.id.cardNameTIET)
-        val numberTIL = findViewById<TextInputLayout>(R.id.cardNumberTIL)
+        numberTIL = findViewById(R.id.cardNumberTIL)
         numberET = findViewById(R.id.cardNumberTIET)
-        val storesDropdown = findViewById<MaterialAutoCompleteTextView>(R.id.cardStoreACTV)
+        storesDropdown = findViewById(R.id.cardStoreACTV)
+        storeTIL = findViewById(R.id.cardStoreTIL)
         typeDropdown = findViewById(R.id.cardTypeACTV)
+        typeTIL = findViewById(R.id.cardValueTypeTIL)
         val saveBtn = findViewById<MaterialButton>(R.id.cardSaveBtn)
         val deleteBtn = findViewById<MaterialButton>(R.id.cardDeleteBtn)
         val rootView = findViewById<ConstraintLayout>(R.id.cardConstraintLayout)
@@ -61,7 +65,7 @@ class AddCardActivity : AppCompatActivity() {
                         CARD_ID, -1
                     )
                 )
-                prepareEdit(card!!, nameET, numberET, typeDropdown)
+                prepareEdit(card!!, nameET, numberET)
                 deleteBtn.visibility = View.VISIBLE
             }
         }
@@ -70,8 +74,8 @@ class AddCardActivity : AppCompatActivity() {
 
         numberTIL.setEndIconOnClickListener { scanCode() }
 
-        storeDropdownInit(storeViewModel, storesDropdown)
-        typeDropdownInit(typeDropdown)
+        storeDropdownInit()
+        typeDropdownInit()
 
         saveBtn.setOnClickListener {
             if (validate(
@@ -102,17 +106,22 @@ class AddCardActivity : AppCompatActivity() {
     private fun prepareEdit(
         card: Card,
         nameTv: TextInputEditText,
-        numberTv: TextInputEditText,
-        typeDropdown: MaterialAutoCompleteTextView
+        numberTv: TextInputEditText
     ) {
         nameTv.setText(card.name)
         numberTv.setText(card.value)
         storeId = card.store
         typeDropdown.setText(card.type)
         type = card.type
+
+        numberTIL.endIconMode = END_ICON_NONE
+        numberTIL.isEnabled = false
+        numberTv.isEnabled = false
+        typeDropdownDisable()
+        storeDropdownDisable()
     }
 
-    private fun typeDropdownInit(typeDropdown: MaterialAutoCompleteTextView) {
+    private fun typeDropdownInit() {
         val types = BarcodeHelper().barcodeTypes
 
         val typeAdapter = ArrayAdapter(
@@ -122,16 +131,13 @@ class AddCardActivity : AppCompatActivity() {
         )
 
         typeDropdown.setOnItemClickListener { parent, view, position, id ->
-            type = types[position]
+            type = typeDropdown.text.toString()//types[position]
         }
 
         typeDropdown.setAdapter(typeAdapter)
     }
 
-    private fun storeDropdownInit(
-        storeViewModel: StoreViewModel,
-        storesDropdown: MaterialAutoCompleteTextView
-    ) {
+    private fun storeDropdownInit() {
         val storesMap: HashMap<String, Long> = java.util.HashMap()
 
         val array = arrayListOf<String>()
@@ -148,28 +154,22 @@ class AddCardActivity : AppCompatActivity() {
 
         storesDropdown.setAdapter(storesAdapter)
 
-        storeViewModel.getAllStores().observe(this) { stores ->
-            if (array.isNotEmpty())
-                array.clear()
-            if (stores != null) {
-                for (i in stores.indices) {
-                    storesMap[stores[i].name] = stores[i].id
+        StoresTemplate().storesList.stream().forEach { store ->
+            storesMap[store.name] = store.id
 
-                    val n = stores[i].name
-                    if (!array.contains(n))
-                        array.add(n)
-                }
-                storesAdapter.notifyDataSetChanged()
-
-                if (intent.hasExtra(CARD_EDIT))
-                    if (intent.getBooleanExtra(CARD_EDIT, false)) {
-                        val ind =
-                            array.indexOf(storesMap.filter { card!!.store == it.value }.keys.first())
-                        storesDropdown.setSelection(ind)
-                        storesDropdown.setText(array[ind])
-                    }
-            }
+            val n = store.name
+            if (!array.contains(n))
+                array.add(n)
         }
+
+        if (intent.hasExtra(CARD_EDIT))
+            if (intent.getBooleanExtra(CARD_EDIT, false)) {
+                val ind =
+                    array.indexOf(storesMap.filter { card!!.store == it.value }.keys.first())
+                storeId = card!!.store
+                //storesDropdown.setSelection(ind)
+                storesDropdown.setText(array[ind])
+            }
     }
 
     private fun validate(
@@ -220,6 +220,7 @@ class AddCardActivity : AppCompatActivity() {
     private var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
+                typeDropdownDisable()
                 val data: Intent? = result.data
                 numberET.setText(data?.getStringExtra(ScanActivity.CODE_VALUE))
                 val t = data?.getStringExtra(ScanActivity.CODE_TYPE)
@@ -227,6 +228,20 @@ class AddCardActivity : AppCompatActivity() {
                 type = t!!
             }
         }
+
+    private fun typeDropdownDisable() {
+        typeDropdown.isEnabled = false
+        typeTIL.isEnabled = false
+        typeTIL.endIconMode = END_ICON_NONE
+        typeDropdown.dropDownHeight = 0
+    }
+
+    private fun storeDropdownDisable() {
+        storesDropdown.isEnabled = false
+        storeTIL.isEnabled = false
+        storeTIL.endIconMode = END_ICON_NONE
+        storesDropdown.dropDownHeight = 0
+    }
 
     private fun scanCode() {
         val intent = Intent(this, ScanActivity::class.java)

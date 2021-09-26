@@ -3,9 +3,14 @@ package com.pl.cards.ui
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import android.widget.GridView
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.textview.MaterialTextView
 import com.pl.cards.R
 import com.pl.cards.helper.StoresTemplate
 import com.pl.cards.ui.adapter.GridAdapter
@@ -21,25 +26,26 @@ class MainActivity : AppCompatActivity() {
 
         val storeViewModel = ViewModelProvider(this).get(StoreViewModel::class.java)
 
-        val storesArray = StoresTemplate().storesArray
-
+        val storesList = StoresTemplate().storesList
 
         val grid = findViewById<GridView>(R.id.cardsGrid)
         val add = findViewById<ImageButton>(R.id.gridToolbarAdd)
+        val noCards = findViewById<MaterialTextView>(R.id.cardsNoCardsTv)
 
-        val adapter = GridAdapter(this, storesArray)
+        Thread {
+            storesList.forEach { s -> storeViewModel.insert(s) }
+        }
+
+        val adapter = GridAdapter(this, emptyList())
         grid.adapter = adapter
 
         storeViewModel.getAllStores().observe(this) { stores ->
-            for (i in storesArray.indices) {
-                if (!stores.stream()
-                        .filter { o -> o.name.lowercase() == storesArray[i].name.lowercase() }
-                        .findFirst()
-                        .isPresent
-                )
-                    storeViewModel.insert(storesArray[i])
-            }
+            if(stores.isEmpty())
+                noCards.visibility = View.VISIBLE
+            else
+                noCards.visibility = View.GONE
 
+            adapter.setStores(stores)
             adapter.notifyDataSetChanged()
         }
 

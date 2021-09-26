@@ -13,7 +13,12 @@ import com.pl.cards.R
 import com.pl.cards.model.Store
 import com.pl.cards.ui.StoreCardsActivity
 
-class GridAdapter(private val ctx: Context, private val stores: Array<Store>) : BaseAdapter() {
+class GridAdapter(private val ctx: Context, private var stores: List<Store>) : BaseAdapter() {
+
+    fun setStores(stores: List<Store>) {
+        this.stores = stores
+    }
+
     override fun getCount(): Int {
         return stores.size
     }

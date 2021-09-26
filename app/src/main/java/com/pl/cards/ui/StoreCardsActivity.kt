@@ -36,6 +36,8 @@ class StoreCardsActivity : AppCompatActivity() {
         recycler.setHasFixedSize(false)
 
         cardViewModel.getStoreCards(storeId).observe(this) { cards ->
+            if(cards.isEmpty())
+                finish()
             adapter.setCardsList(cards)
             adapter.notifyDataSetChanged()
         }
