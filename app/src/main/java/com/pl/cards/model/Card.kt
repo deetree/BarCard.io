@@ -18,7 +18,6 @@ data class Card(
     var store: Long,
     var name: String,
     var value: String,
-    var priv: Int,
     var type: String
 ) {
     @PrimaryKey(autoGenerate = true)

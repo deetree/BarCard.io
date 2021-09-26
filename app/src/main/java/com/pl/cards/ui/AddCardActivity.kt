@@ -48,8 +48,6 @@ class AddCardActivity : AppCompatActivity() {
         numberET = findViewById(R.id.cardNumberTIET)
         val storesDropdown = findViewById<MaterialAutoCompleteTextView>(R.id.cardStoreACTV)
         typeDropdown = findViewById(R.id.cardTypeACTV)
-        val privateLayout = findViewById<ConstraintLayout>(R.id.cardPrivateConstraintLayout)
-        val privateChkBox = findViewById<MaterialCheckBox>(R.id.cardPrivateChkBox)
         val saveBtn = findViewById<MaterialButton>(R.id.cardSaveBtn)
         val deleteBtn = findViewById<MaterialButton>(R.id.cardDeleteBtn)
         val rootView = findViewById<ConstraintLayout>(R.id.cardConstraintLayout)
@@ -63,7 +61,7 @@ class AddCardActivity : AppCompatActivity() {
                         CARD_ID, -1
                     )
                 )
-                prepareEdit(card!!, nameET, numberET, privateChkBox, typeDropdown)
+                prepareEdit(card!!, nameET, numberET, typeDropdown)
                 deleteBtn.visibility = View.VISIBLE
             }
         }
@@ -74,8 +72,6 @@ class AddCardActivity : AppCompatActivity() {
 
         storeDropdownInit(storeViewModel, storesDropdown)
         typeDropdownInit(typeDropdown)
-
-        privateLayout.setOnClickListener { privateChkBox.isChecked = !privateChkBox.isChecked }
 
         saveBtn.setOnClickListener {
             if (validate(
@@ -91,13 +87,13 @@ class AddCardActivity : AppCompatActivity() {
                         update(
                             card!!, nameET.text.toString().trim(),
                             numberET.text.toString().trim(),
-                            storeId, type, privateChkBox.isChecked, cardViewModel
+                            storeId, type, cardViewModel
                         )
                 } else
                     save(
                         nameET.text.toString().trim(),
                         numberET.text.toString().trim(),
-                        storeId, type, privateChkBox.isChecked, cardViewModel
+                        storeId, type, cardViewModel
                     )
             }
         }
@@ -107,12 +103,10 @@ class AddCardActivity : AppCompatActivity() {
         card: Card,
         nameTv: TextInputEditText,
         numberTv: TextInputEditText,
-        privateChkBox: MaterialCheckBox,
         typeDropdown: MaterialAutoCompleteTextView
     ) {
         nameTv.setText(card.name)
         numberTv.setText(card.value)
-        privateChkBox.isChecked = card.priv == 1
         storeId = card.store
         typeDropdown.setText(card.type)
         type = card.type
@@ -199,12 +193,9 @@ class AddCardActivity : AppCompatActivity() {
         number: String,
         store: Long,
         type: String,
-        priv: Boolean,
         cardViewModel: CardViewModel
     ) {
-        val privVal = if (priv) 1 else 0
-
-        val card = Card(SecureRandom().nextLong(), store, name, number, privVal, type)
+        val card = Card(SecureRandom().nextLong(), store, name, number, type)
         cardViewModel.insert(card)
         finish()
     }
@@ -215,14 +206,12 @@ class AddCardActivity : AppCompatActivity() {
         number: String,
         store: Long,
         type: String,
-        priv: Boolean,
         cardViewModel: CardViewModel
     ) {
         card.name = name
         card.value = number
         card.store = store
         card.type = type
-        card.priv = if (priv) 1 else 0
 
         cardViewModel.update(card)
         finish()
@@ -259,7 +248,8 @@ class AddCardActivity : AppCompatActivity() {
             }
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setMessage(getString(R.string.you_sure)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+        builder.setMessage(getString(R.string.you_sure))
+            .setPositiveButton(getString(R.string.yes), dialogClickListener)
             .setNegativeButton(getString(R.string.no), dialogClickListener).show()
     }
 }

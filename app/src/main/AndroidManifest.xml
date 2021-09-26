@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Cards">
         <activity
+            android:name=".ui.ShowCardActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.ScanActivity"
             android:screenOrientation="portrait" />
         <activity

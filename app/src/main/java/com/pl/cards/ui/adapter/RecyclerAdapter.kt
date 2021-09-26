@@ -16,18 +16,17 @@ import com.google.android.material.textview.MaterialTextView
 import com.pl.cards.R
 import com.pl.cards.model.Card
 import com.pl.cards.ui.AddCardActivity
+import com.pl.cards.ui.ShowCardActivity
 import com.pl.cards.viewmodel.CardViewModel
 
 class RecyclerAdapter(
     private val ctx: Context,
-    private var cards: List<Card>,
-    cardViewModel: CardViewModel
+    private var cards: List<Card>
 ) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: MaterialTextView = view.findViewById(R.id.cardNameTv)
-        val privateImg: ImageView = view.findViewById(R.id.cardPrivateImg)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -39,8 +38,6 @@ class RecyclerAdapter(
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.textView.text = cards[position].name
-        viewHolder.privateImg.visibility =
-            if (cards[position].priv == 1) View.VISIBLE else View.GONE
 
         viewHolder.itemView.setOnLongClickListener {
             val i = Intent(ctx, AddCardActivity::class.java)
@@ -48,6 +45,12 @@ class RecyclerAdapter(
             i.putExtra(AddCardActivity.CARD_ID, cards[position].id)
             ctx.startActivity(i)
             true
+        }
+
+        viewHolder.itemView.setOnClickListener {
+            val i = Intent(ctx, ShowCardActivity::class.java)
+            i.putExtra(AddCardActivity.CARD_ID, cards[position].id)
+            ctx.startActivity(i)
         }
     }
 

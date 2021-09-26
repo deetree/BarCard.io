@@ -29,8 +29,7 @@ class StoreCardsActivity : AppCompatActivity() {
 
         supportActionBar?.title = storeName
 
-        //val cards = cardViewModel.getStoreCards(storeId)
-        adapter = RecyclerAdapter(this, emptyList(), cardViewModel)
+        adapter = RecyclerAdapter(this, emptyList())
 
         val recycler = findViewById<RecyclerView>(R.id.cardsRecycler)
         recycler.layoutManager = LinearLayoutManager(this)
@@ -40,8 +39,6 @@ class StoreCardsActivity : AppCompatActivity() {
             adapter.setCardsList(cards)
             adapter.notifyDataSetChanged()
         }
-
-
 
         recycler.adapter = adapter
     }
