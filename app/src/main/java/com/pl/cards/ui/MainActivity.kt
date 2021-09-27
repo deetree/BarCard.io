@@ -10,6 +10,7 @@ import android.widget.GridView
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textview.MaterialTextView
 import com.pl.cards.R
 import com.pl.cards.helper.StoresTemplate
@@ -26,21 +27,21 @@ class MainActivity : AppCompatActivity() {
 
         val storeViewModel = ViewModelProvider(this).get(StoreViewModel::class.java)
 
-        val storesList = StoresTemplate().storesList
+        val storesList = StoresTemplate(this).storesList
 
         val grid = findViewById<GridView>(R.id.cardsGrid)
-        val add = findViewById<ImageButton>(R.id.gridToolbarAdd)
+        val add = findViewById<FloatingActionButton>(R.id.gridAdd)
         val noCards = findViewById<MaterialTextView>(R.id.cardsNoCardsTv)
 
-        Thread {
-            storesList.forEach { s -> storeViewModel.insert(s) }
-        }
+        grid.isNestedScrollingEnabled = true
+
+        storesList.forEach { s -> storeViewModel.insert(s) }
 
         val adapter = GridAdapter(this, emptyList())
         grid.adapter = adapter
 
         storeViewModel.getAllStores().observe(this) { stores ->
-            if(stores.isEmpty())
+            if (stores.isEmpty())
                 noCards.visibility = View.VISIBLE
             else
                 noCards.visibility = View.GONE
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         add.setOnClickListener {
             startActivity(Intent(this, AddCardActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
     }
 }

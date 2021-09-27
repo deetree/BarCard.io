@@ -19,4 +19,7 @@
     <string name="yes">Yes</string>
     <string name="cannot_generate">Cannot generate barcode, invalid value</string>
     <string name="no_cards">No cards</string>
+    <string name="other">Other</string>
+    <string name="add_card">Add card</string>
+    <string name="copied">Copied!</string>
 </resources>

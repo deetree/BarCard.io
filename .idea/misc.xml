@@ -5,12 +5,13 @@
       <map>
         <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/drawable/ic_baseline_card_membership_24.xml" value="0.2703125" />
         <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_add_card.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_main.xml" value="0.28892835997631733" />
         <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_scan.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_show_card.xml" value="0.24010416666666667" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_show_card.xml" value="0.4" />
         <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/activity_store_cards.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/grid_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/layout/recycler_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mariusz/AndroidStudioProjects/Cards/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.14635416666666667" />
       </map>
     </option>
   </component>

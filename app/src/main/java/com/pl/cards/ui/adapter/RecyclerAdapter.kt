@@ -1,5 +1,6 @@
 package com.pl.cards.ui.adapter
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
@@ -44,6 +45,7 @@ class RecyclerAdapter(
             i.putExtra(AddCardActivity.CARD_EDIT, true)
             i.putExtra(AddCardActivity.CARD_ID, cards[position].id)
             ctx.startActivity(i)
+            (ctx as Activity).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             true
         }
 
@@ -51,6 +53,7 @@ class RecyclerAdapter(
             val i = Intent(ctx, ShowCardActivity::class.java)
             i.putExtra(AddCardActivity.CARD_ID, cards[position].id)
             ctx.startActivity(i)
+            (ctx as Activity).overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 

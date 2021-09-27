@@ -1,5 +1,8 @@
 package com.pl.cards.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +27,10 @@ import com.pl.cards.helper.BarcodeHelper
 import com.pl.cards.helper.StoresTemplate
 import com.pl.cards.viewmodel.CardViewModel
 import java.lang.IllegalArgumentException
+import kotlin.math.roundToInt
+import android.widget.LinearLayout
+import android.view.WindowManager
+
 
 class ShowCardActivity : AppCompatActivity() {
 
@@ -38,6 +45,8 @@ class ShowCardActivity : AppCompatActivity() {
 
         supportActionBar?.hide()
 
+        setMaxBrightness()
+
         val root = findViewById<ConstraintLayout>(R.id.showCardRoot)
         logo = findViewById(R.id.showCardLogo)
         cardview = findViewById(R.id.showCardView)
@@ -48,7 +57,7 @@ class ShowCardActivity : AppCompatActivity() {
         val cardViewModel = ViewModelProvider(this).get(CardViewModel::class.java)
         val card = cardViewModel.getCard(cardId)
 
-        val store = StoresTemplate().storesList.first { s -> s.id == card.store }
+        val store = StoresTemplate(this).storesList.first { s -> s.id == card.store }
 
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
@@ -57,15 +66,30 @@ class ShowCardActivity : AppCompatActivity() {
         val height = displayMetrics.heightPixels
 
         root.setBackgroundColor(Color.parseColor(store.color))
+        window.statusBarColor = Color.parseColor(store.color)
         logo.setImageResource(store.image)
         setLogoSize(width, height)
         setCardSize(width, height)
 
         try {
             displayBitmap(card.value, card.type, width, height / 5 * 3)
-        } catch(e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             Toast.makeText(this, getString(R.string.cannot_generate), Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun copyToClipboard(text: String) {
+        val myClipboard = this.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val myClip: ClipData = ClipData.newPlainText("barcode_value", text)
+        myClipboard.setPrimaryClip(myClip)
+
+        Toast.makeText(this, getString(R.string.copied), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setMaxBrightness() {
+        val layout = window.attributes
+        layout.screenBrightness = 1f
+        window.attributes = layout
     }
 
     private fun setLogoSize(width: Int, height: Int) {
@@ -94,6 +118,7 @@ class ShowCardActivity : AppCompatActivity() {
             )
         )
         barcodeValue.text = value
+        barcodeValue.setOnClickListener { copyToClipboard(value) }
     }
 
     private fun createBarcodeBitmap(
@@ -219,5 +244,10 @@ class ShowCardActivity : AppCompatActivity() {
             )
             else -> null
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

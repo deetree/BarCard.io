@@ -45,6 +45,8 @@ class AddCardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_card)
 
+        supportActionBar?.title = getString(R.string.add_card)
+
         val nameET = findViewById<TextInputEditText>(R.id.cardNameTIET)
         numberTIL = findViewById(R.id.cardNumberTIL)
         numberET = findViewById(R.id.cardNumberTIET)
@@ -154,7 +156,7 @@ class AddCardActivity : AppCompatActivity() {
 
         storesDropdown.setAdapter(storesAdapter)
 
-        StoresTemplate().storesList.stream().forEach { store ->
+        StoresTemplate(this).storesList.stream().forEach { store ->
             storesMap[store.name] = store.id
 
             val n = store.name
@@ -246,6 +248,7 @@ class AddCardActivity : AppCompatActivity() {
     private fun scanCode() {
         val intent = Intent(this, ScanActivity::class.java)
         resultLauncher.launch(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun deleteConfirm(cardViewModel: CardViewModel) {
@@ -266,5 +269,10 @@ class AddCardActivity : AppCompatActivity() {
         builder.setMessage(getString(R.string.you_sure))
             .setPositiveButton(getString(R.string.yes), dialogClickListener)
             .setNegativeButton(getString(R.string.no), dialogClickListener).show()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

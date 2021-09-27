@@ -7,7 +7,7 @@ import com.pl.cards.model.Store
 @Dao
 interface StoreDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(store: Store)
 
     @Update

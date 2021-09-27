@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
+    android:background="#ffbe00"
     tools:context=".ui.ShowCardActivity"
     android:id="@+id/showCardRoot">
 
@@ -15,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/biedronka" />
+        tools:src="@drawable/esotiq" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/showCardView"
@@ -35,6 +36,7 @@
                 android:id="@+id/showCardBarcode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:keepScreenOn="true"
                 app:layout_constraintBottom_toTopOf="@id/showCardBarcodeValue"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

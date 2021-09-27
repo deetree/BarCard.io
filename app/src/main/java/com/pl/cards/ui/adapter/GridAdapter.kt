@@ -57,6 +57,7 @@ class GridAdapter(private val ctx: Context, private var stores: List<Store>) : B
             i.putExtra(StoreCardsActivity.STORE_ID, store.id)
             i.putExtra(StoreCardsActivity.STORE_NAME, store.name)
             ctx.startActivity(i)
+            (ctx as Activity).overridePendingTransition (android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
         return myView

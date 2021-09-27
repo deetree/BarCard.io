@@ -45,4 +45,8 @@ class StoreCardsActivity : AppCompatActivity() {
         recycler.adapter = adapter
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 }

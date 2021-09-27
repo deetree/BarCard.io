@@ -345,6 +345,7 @@ class ScanActivity : AppCompatActivity() {
         i.putExtra(CODE_TYPE, BarcodeHelper().getStringType(barcode.format))
         setResult(RESULT_OK, i)
         finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun aspectRatio(width: Int, height: Int): Int {
@@ -413,6 +414,11 @@ class ScanActivity : AppCompatActivity() {
 
         flashlightEnabled = false
         switchFlashlight(flashlightEnabled)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     companion object {
