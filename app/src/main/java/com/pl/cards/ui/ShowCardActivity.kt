@@ -114,7 +114,12 @@ class ShowCardActivity : AppCompatActivity() {
             )
         )
         barcodeValue.text = value
+
         barcodeValue.setOnClickListener { copyToClipboard(value) }
+        barcodeValue.setOnLongClickListener {
+            Toast.makeText(this, value, Toast.LENGTH_LONG).show()
+            true
+        }
     }
 
     private fun createBarcodeBitmap(
