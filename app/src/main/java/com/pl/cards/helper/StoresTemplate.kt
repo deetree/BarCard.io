@@ -12,7 +12,6 @@ class StoresTemplate(private val ctx: Context) {
     private val payback = Store(5, "Payback", "#185ca5", R.drawable.payback)
     private val orlen = Store(6, "Orlen", "#d81e05", R.drawable.orlen)
     private val leclerc = Store(7, "E. Leclerc", "#fefefe", R.drawable.leclerc)
-
     private val rossmann = Store(8, "Rossmann", "#fefefe", R.drawable.rossmann)
     private val hebe = Store(9, "Hebe", "#ec008b", R.drawable.hebe)
     private val ccc = Store(10, "CCC", "#f26a21", R.drawable.ccc)

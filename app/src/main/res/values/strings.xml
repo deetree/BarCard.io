@@ -22,4 +22,5 @@
     <string name="other">Other</string>
     <string name="add_card">Add card</string>
     <string name="copied">Copied!</string>
+    <string name="camera_perm_required">Camera permission required</string>
 </resources>

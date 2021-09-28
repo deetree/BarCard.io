@@ -1,71 +1,39 @@
 package com.pl.cards.ui
 
 import android.Manifest
-import androidx.core.view.isVisible
-
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
-import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.net.Uri
 import android.os.*
-import com.pl.cards.R
-import android.util.DisplayMetrics
 import android.util.Log
-import android.widget.ImageButton
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
+import com.pl.cards.R
 import com.pl.cards.helper.BarcodeHelper
-import com.pl.cards.viewmodel.CameraXViewModel
 import java.util.concurrent.Executors
-import kotlin.IllegalStateException
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 class ScanActivity : AppCompatActivity() {
+    private val CAMERA_PERMISSION_REQUEST_CODE = 1
 
-    private var previewView: PreviewView? = null
-    private var cameraProvider: ProcessCameraProvider? = null
-    private var cameraSelector: CameraSelector? = null
-    private var lensFacing = CameraSelector.LENS_FACING_BACK
-    private var previewUseCase: Preview? = null
-    private var analysisUseCase: ImageAnalysis? = null
-    private var vibrationImgBtn: ImageButton? = null
-    private var flashlightImgBtn: ImageButton? = null
-    private var soundImgBtn: ImageButton? = null
-    private var camera: Camera? = null
+    private lateinit var previewView: PreviewView
 
-    private var soundEnabled: Boolean = true
-    private var vibrationEnabled: Boolean = true
-    private var flashlightEnabled: Boolean = false
-
-    private val SOUND_TAG: String = "SOUND"
-    private val VIBRATION_TAG: String = "VIBRATION"
-
-    private val screenAspectRatio: Int
-        get() {
-            // Get screen metrics used to setup camera for full screen resolution
-            val metrics = DisplayMetrics().also { previewView?.display?.getRealMetrics(it) }
-            return aspectRatio(metrics.widthPixels, metrics.heightPixels)
-        }
+    private var captured = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,304 +42,26 @@ class ScanActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         previewView = findViewById(R.id.preview_view)
-        vibrationImgBtn = findViewById(R.id.vibrationImgBtn)
-        soundImgBtn = findViewById(R.id.volumeImgBtn)
-        flashlightImgBtn = findViewById(R.id.flashlightImgBtn)
 
-        captured = false
+        if (hasCameraPermission()) bindCameraUseCases()
+        else requestPermission()
 
-        setupCamera()
-        setupFlashlight()
-        setupButtonListeners()
-    }
-
-    private fun setupFlashlight() {
-        val isFlashAvailable = camera?.cameraInfo?.hasFlashUnit()
-        if (isFlashAvailable != null) {
-            flashlightImgBtn?.isVisible = isFlashAvailable
-        }
     }
 
     override fun onResume() {
         super.onResume()
         volumeControlStream = AudioManager.STREAM_MUSIC
 
-        val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return
-        soundEnabled = sharedPref.getBoolean(SOUND_TAG, soundEnabled)
-        vibrationEnabled = sharedPref.getBoolean(VIBRATION_TAG, vibrationEnabled)
-
-        updateSoundIcon()
-        updateVibrationIcon()
-
-        flashlightEnabled = false
-        updateFlashlightIcon()
-    }
-
-    private fun setupButtonListeners() {
-        soundImgBtn?.setOnClickListener {
-            if (soundEnabled)
-                makeToast(getString(R.string.sound_disabled))
-            else
-                makeToast(getString(R.string.sound_enabled))
-
-            soundEnabled = !soundEnabled
-            updateSoundIcon()
-        }
-
-        vibrationImgBtn?.setOnClickListener {
-            if (vibrationEnabled)
-                makeToast(getString(R.string.vibration_disabled))
-            else
-                makeToast(getString(R.string.vibration_enabled))
-
-            vibrationEnabled = !vibrationEnabled
-            updateVibrationIcon()
-        }
-
-        flashlightImgBtn?.setOnClickListener {
-            flashlightEnabled = !flashlightEnabled
-            updateFlashlightIcon()
-            switchFlashlight(flashlightEnabled)
-        }
-    }
-
-    private fun updateSoundIcon() {
-        if (soundEnabled)
-            soundImgBtn?.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_volume_up_24,
-                    null
-                )
-            )
-        else
-            soundImgBtn?.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_volume_off_24,
-                    null
-                )
-            )
-    }
-
-    private fun updateVibrationIcon() {
-        if (vibrationEnabled)
-            vibrationImgBtn?.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_vibration_24,
-                    null
-                )
-            )
-        else
-            vibrationImgBtn?.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_phonelink_erase_24,
-                    null
-                )
-            )
-    }
-
-    private fun updateFlashlightIcon() {
-        if (flashlightEnabled)
-            flashlightImgBtn?.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_flashlight_off_24,
-                    null
-                )
-            )
-        else
-            flashlightImgBtn?.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_flashlight_on_24,
-                    null
-                )
-            )
-    }
-
-    private fun switchFlashlight(status: Boolean) {
-        camera!!.cameraControl.enableTorch(status)
-    }
-
-    private fun setupCamera() {
-        cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-        ViewModelProvider(
-            this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(CameraXViewModel::class.java)
-            .processCameraProvider
-            .observe(
-                this,
-                Observer { provider: ProcessCameraProvider? ->
-                    cameraProvider = provider
-                    if (isCameraPermissionGranted()) {
-                        bindCameraUseCases()
-                    } else {
-                        ActivityCompat.requestPermissions(
-                            this,
-                            arrayOf(Manifest.permission.CAMERA),
-                            PERMISSION_CAMERA_REQUEST
-                        )
-                    }
-                }
-            )
-    }
-
-    private fun bindCameraUseCases() {
-        bindPreviewUseCase()
-        bindAnalyseUseCase()
-    }
-
-    private fun bindPreviewUseCase() {
-        if (cameraProvider == null) {
-            return
-        }
-        if (previewUseCase != null) {
-            cameraProvider!!.unbind(previewUseCase)
-        }
-
-        previewUseCase = try {
-            Preview.Builder()
-                .setTargetAspectRatio(screenAspectRatio)
-                .setTargetRotation(previewView!!.display.rotation)
-                .build()
-        } catch (e: IllegalStateException) {
-            Preview.Builder()
-                .setTargetAspectRatio(screenAspectRatio)
-                .build()
-        }
-        previewUseCase!!.setSurfaceProvider(previewView!!.surfaceProvider)
-
-        try {
-            camera = cameraProvider!!.bindToLifecycle(
-                this,
-                cameraSelector!!,
-                previewUseCase
-            )
-        } catch (illegalStateException: IllegalStateException) {
-            Log.e(TAG, illegalStateException.message.toString())
-        } catch (illegalArgumentException: IllegalArgumentException) {
-            Log.e(TAG, illegalArgumentException.message.toString())
-        }
-    }
-
-    private fun bindAnalyseUseCase() {
-        // Note that if you know which format of barcode your app is dealing with, detection will be
-        // faster to specify the supported barcode formats one by one, e.g.
-        // BarcodeScannerOptions.Builder()
-        //     .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-        //     .build();
-        val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
-
-        if (cameraProvider == null) {
-            return
-        }
-        if (analysisUseCase != null) {
-            cameraProvider!!.unbind(analysisUseCase)
-        }
-
-        try {
-            analysisUseCase = ImageAnalysis.Builder()
-                .setTargetAspectRatio(screenAspectRatio)
-                .setTargetRotation(previewView!!.display.rotation)
-                .build()
-        } catch (e: java.lang.IllegalStateException) {
-            analysisUseCase = ImageAnalysis.Builder()
-                .setTargetAspectRatio(screenAspectRatio)
-                .build()
-        }
-
-        // Initialize our background executor
-        val cameraExecutor = Executors.newSingleThreadExecutor()
-
-        analysisUseCase?.setAnalyzer(
-            cameraExecutor,
-            { imageProxy ->
-                processImageProxy(barcodeScanner, imageProxy)
-            }
-        )
-
-        try {
-            cameraProvider!!.bindToLifecycle(
-                this,
-                cameraSelector!!,
-                analysisUseCase
-            )
-        } catch (illegalStateException: IllegalStateException) {
-            Log.e(TAG, illegalStateException.message.toString())
-        } catch (illegalArgumentException: IllegalArgumentException) {
-            Log.e(TAG, illegalArgumentException.message.toString())
-        }
-    }
-
-    @SuppressLint("UnsafeOptInUsageError")
-    private fun processImageProxy(
-        barcodeScanner: BarcodeScanner,
-        imageProxy: ImageProxy
-    ) {
-        val inputImage =
-            InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
-
-        barcodeScanner.process(inputImage)
-            .addOnSuccessListener { barcodes ->
-                barcodes.distinct()
-                barcodes.forEach {
-                    if (!captured) {
-                        captured = true
-                        if (soundEnabled)
-                            beep(100)
-                        if (vibrationEnabled)
-                            vibrate(100)
-
-                        sendResult(it)
-                    }
-                }
-            }
-            .addOnFailureListener {
-                //Log.e(TAG, it.message)
-            }.addOnCompleteListener {
-                // When the image is from CameraX analysis use case, must call image.close() on received
-                // images when finished using them. Otherwise, new images may not be received or the camera
-                // may stall.
-                imageProxy.close()
-            }
+        captured = false
     }
 
     private fun sendResult(barcode: Barcode) {
         val i = Intent()
-        i.putExtra(CODE_VALUE, barcode.displayValue)//todo
+        i.putExtra(CODE_VALUE, barcode.rawValue)
         i.putExtra(CODE_TYPE, BarcodeHelper().getStringType(barcode.format))
         setResult(RESULT_OK, i)
         finish()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-    }
-
-    private fun aspectRatio(width: Int, height: Int): Int {
-        val previewRatio = max(width, height).toDouble() / min(width, height)
-        if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
-            return AspectRatio.RATIO_4_3
-        }
-        return AspectRatio.RATIO_16_9
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == PERMISSION_CAMERA_REQUEST) {
-            if (isCameraPermissionGranted()) bindCameraUseCases() else makeToast(getString(R.string.camera_not_granted))
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    private fun isCameraPermissionGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            baseContext,
-            Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun beep(duration: Int) {
@@ -398,22 +88,142 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun makeToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private fun hasCameraPermission() =
+        ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.CAMERA),
+            CAMERA_PERMISSION_REQUEST_CODE
+        )
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        val sharedPref = this.getPreferences(Context.MODE_PRIVATE) ?: return
-        with(sharedPref.edit()) {
-            putBoolean(SOUND_TAG, soundEnabled)
-            putBoolean(VIBRATION_TAG, vibrationEnabled)
-            apply()
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            bindCameraUseCases()
+        } else {
+            Toast.makeText(
+                this,
+                getString(R.string.camera_perm_required),
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
-        flashlightEnabled = false
-        switchFlashlight(flashlightEnabled)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun bindCameraUseCases() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+
+            val previewUseCase = Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
+
+            val options = BarcodeScannerOptions.Builder().setBarcodeFormats(
+                Barcode.FORMAT_CODE_128,
+                Barcode.FORMAT_CODE_39,
+                Barcode.FORMAT_CODE_93,
+                Barcode.FORMAT_EAN_8,
+                Barcode.FORMAT_EAN_13,
+                Barcode.FORMAT_QR_CODE,
+                Barcode.FORMAT_ITF,
+                Barcode.FORMAT_CODABAR,
+                Barcode.FORMAT_DATA_MATRIX,
+                Barcode.FORMAT_AZTEC,
+                Barcode.FORMAT_UPC_A,
+                Barcode.FORMAT_UPC_E,
+                Barcode.FORMAT_PDF417
+            ).build()
+
+            val scanner = BarcodeScanning.getClient(options)
+
+            // setting up the analysis use case
+            val analysisUseCase = ImageAnalysis.Builder()
+                .build()
+
+            // define the actual functionality of our analysis use case
+            analysisUseCase.setAnalyzer(
+                Executors.newSingleThreadExecutor(),
+                { imageProxy ->
+                    processImageProxy(scanner, imageProxy)
+                }
+            )
+
+            // configure to use the back camera
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    previewUseCase,
+                    analysisUseCase
+                )
+            } catch (illegalStateException: IllegalStateException) {
+            } catch (illegalArgumentException: IllegalArgumentException) {
+            }
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun processImageProxy(
+        barcodeScanner: BarcodeScanner,
+        imageProxy: ImageProxy
+    ) {
+
+        imageProxy.image?.let { image ->
+            val inputImage =
+                InputImage.fromMediaImage(
+                    image,
+                    imageProxy.imageInfo.rotationDegrees
+                )
+
+            barcodeScanner.process(inputImage)
+                .addOnSuccessListener { barcodeList ->
+                    val barcode = barcodeList.getOrNull(0)
+
+                    barcode?.let { value ->
+                        if (!captured) {
+                            captured = true
+                            beep(100)
+                            vibrate(100)
+
+                            sendResult(value)
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    // This failure will happen if the barcode scanning model
+                    // fails to download from Google Play Services
+
+                    Log.e(TAG, it.message.orEmpty())
+                }.addOnCompleteListener {
+                    // When the image is from CameraX analysis use case, must
+                    // call image.close() on received images when finished
+                    // using them. Otherwise, new images may not be received
+                    // or the camera may stall.
+
+                    imageProxy.image?.close()
+                    imageProxy.close()
+                }
+        }
     }
 
     override fun onBackPressed() {
@@ -422,13 +232,7 @@ class ScanActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val TAG = ScanActivity::class.java.simpleName
-        private const val PERMISSION_CAMERA_REQUEST = 1
-
-        private var captured = false
-
-        private const val RATIO_4_3_VALUE = 4.0 / 3.0
-        private const val RATIO_16_9_VALUE = 16.0 / 9.0
+        val TAG: String = MainActivity::class.java.simpleName + " SCAN"
 
         const val CODE_VALUE = "code_value"
         const val CODE_TYPE = "code_type"
