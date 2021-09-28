@@ -1,8 +1,7 @@
 package com.pl.cards.ui
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +35,7 @@ class StoreCardsActivity : AppCompatActivity() {
         recycler.setHasFixedSize(false)
 
         cardViewModel.getStoreCards(storeId).observe(this) { cards ->
-            if(cards.isEmpty())
+            if (cards.isEmpty())
                 finish()
             adapter.setCardsList(cards)
             adapter.notifyDataSetChanged()
@@ -47,6 +46,6 @@ class StoreCardsActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }

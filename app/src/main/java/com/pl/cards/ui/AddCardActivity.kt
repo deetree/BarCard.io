@@ -169,7 +169,6 @@ class AddCardActivity : AppCompatActivity() {
                 val ind =
                     array.indexOf(storesMap.filter { card!!.store == it.value }.keys.first())
                 storeId = card!!.store
-                //storesDropdown.setSelection(ind)
                 storesDropdown.setText(array[ind])
             }
     }
@@ -273,6 +272,6 @@ class AddCardActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }

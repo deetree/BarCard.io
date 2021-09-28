@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BarCard.io</string>
+    <string name="name">Nazwa</string>
+    <string name="number">Numer</string>
+    <string name="store">Sklep</string>
+    <string name="save">Zapisz</string>
+    <string name="invalid_data">Niepoprawne dane</string>
+    <string name="scan">Skanuj</string>
+    <string name="camera_not_granted">Nie udzielono uprawnienia na dostęp do aparatu</string>
+    <string name="delete">Usuń</string>
+    <string name="you_sure">Czy na pewno chcesz usunąć?</string>
+    <string name="no">Nie</string>
+    <string name="yes">Tak</string>
+    <string name="cannot_generate">Nie można wygenerować kodu, niepoprawna wartość</string>
+    <string name="no_cards">Brak kart</string>
+    <string name="other">Inne</string>
+    <string name="add_card">Dodaj kartę</string>
+    <string name="copied">Skopiowano!</string>
+    <string name="camera_perm_required">Uprawnienie na dostęp do aparatu jest wymagane</string>
+</resources>

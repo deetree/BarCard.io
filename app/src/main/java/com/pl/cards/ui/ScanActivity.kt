@@ -154,11 +154,9 @@ class ScanActivity : AppCompatActivity() {
 
             val scanner = BarcodeScanning.getClient(options)
 
-            // setting up the analysis use case
             val analysisUseCase = ImageAnalysis.Builder()
                 .build()
 
-            // define the actual functionality of our analysis use case
             analysisUseCase.setAnalyzer(
                 Executors.newSingleThreadExecutor(),
                 { imageProxy ->
@@ -166,7 +164,6 @@ class ScanActivity : AppCompatActivity() {
                 }
             )
 
-            // configure to use the back camera
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
@@ -228,7 +225,7 @@ class ScanActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     companion object {

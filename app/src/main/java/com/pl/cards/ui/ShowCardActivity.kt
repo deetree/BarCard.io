@@ -5,12 +5,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.card.MaterialCardView
@@ -26,10 +26,6 @@ import com.pl.cards.R
 import com.pl.cards.helper.BarcodeHelper
 import com.pl.cards.helper.StoresTemplate
 import com.pl.cards.viewmodel.CardViewModel
-import java.lang.IllegalArgumentException
-import kotlin.math.roundToInt
-import android.widget.LinearLayout
-import android.view.WindowManager
 
 
 class ShowCardActivity : AppCompatActivity() {
@@ -248,6 +244,6 @@ class ShowCardActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 }
