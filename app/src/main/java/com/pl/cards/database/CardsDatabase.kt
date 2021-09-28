@@ -35,7 +35,6 @@ abstract class CardsDatabase : RoomDatabase() {
             SupportFactory(
                 SQLiteDatabase.getBytes(
                     EncryptionHelper().getDbEncryptionKey(
-                        ctx,
                         "application_alias"
                     ).toCharArray()
                 )

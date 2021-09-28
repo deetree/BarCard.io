@@ -1,6 +1,5 @@
 package com.pl.cards.helper
 
-import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import java.io.IOException
@@ -20,7 +19,7 @@ class EncryptionHelper {
         CertificateException::class,
         IOException::class
     )
-    fun getDbEncryptionKey(ctx: Context, alias: String): String {
+    fun getDbEncryptionKey(alias: String): String {
         val keyStore: KeyStore = KeyStore.getInstance(AndroidKeyStore)
 
         keyStore.load(null)
