@@ -34,4 +34,8 @@ class CardViewModel (application: Application) : AndroidViewModel(application) {
     fun getCard(id: Long): Card {
         return repo.getCard(id)
     }
+
+    fun getCardsCountByNumber(value: String) : Int {
+        return repo.getCardsCountByNumber(value)
+    }
 }

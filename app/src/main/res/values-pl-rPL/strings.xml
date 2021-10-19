@@ -18,4 +18,5 @@
     <string name="add_card">Dodaj kartę</string>
     <string name="copied">Skopiowano!</string>
     <string name="camera_perm_required">Uprawnienie na dostęp do aparatu jest wymagane</string>
+    <string name="card_exists">Karta o tym numerze już istnieje</string>
 </resources>

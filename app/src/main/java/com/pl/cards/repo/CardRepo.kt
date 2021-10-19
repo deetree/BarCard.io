@@ -41,6 +41,10 @@ class CardRepo(application: Application?) {
         return GetCardAsync(cardDao!!).execute(id).get()
     }
 
+    fun getCardsCountByNumber(value: String) : Int {
+        return GetCardsCountByNumberAsync(cardDao!!).execute(value).get()
+    }
+
     private class InsertCardAsync(private val dao: CardDao) :
         AsyncTask<Card, Void?, Void?>() {
         override fun doInBackground(vararg cards: Card): Void? {
@@ -77,6 +81,13 @@ class CardRepo(application: Application?) {
         AsyncTask<Long, Void?, Card>() {
         override fun doInBackground(vararg p0: Long?): Card {
             return dao.getCard(p0[0]!!)
+        }
+    }
+
+    private class GetCardsCountByNumberAsync(private val dao: CardDao) :
+        AsyncTask<String, Void?, Int>() {
+        override fun doInBackground(vararg p0: String?): Int {
+            return dao.getCardsCountByNumber(p0[0]!!)
         }
     }
 }

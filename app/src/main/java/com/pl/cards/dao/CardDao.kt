@@ -24,4 +24,7 @@ interface CardDao {
 
     @Query("SELECT * FROM card WHERE card.id = :id")
     fun getCard(id: Long): Card
+
+    @Query("SELECT COUNT(*) FROM card WHERE value = :value")
+    fun getCardsCountByNumber(value: String) : Int
 }

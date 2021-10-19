@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,6 +43,8 @@ class AddCardActivity : AppCompatActivity() {
     private lateinit var typeDropdown: MaterialAutoCompleteTextView
     private lateinit var typeTIL: TextInputLayout
 
+    private lateinit var cardViewModel: CardViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_card)
@@ -58,7 +62,7 @@ class AddCardActivity : AppCompatActivity() {
         val deleteBtn = findViewById<MaterialButton>(R.id.cardDeleteBtn)
         val rootView = findViewById<ConstraintLayout>(R.id.cardConstraintLayout)
 
-        val cardViewModel = ViewModelProvider(this).get(CardViewModel::class.java)
+        cardViewModel = ViewModelProvider(this).get(CardViewModel::class.java)
 
         if (intent.hasExtra(CARD_EDIT)) {
             if (intent.getBooleanExtra(CARD_EDIT, false)) {
@@ -75,6 +79,8 @@ class AddCardActivity : AppCompatActivity() {
         deleteBtn.setOnClickListener { deleteConfirm(cardViewModel) }
 
         numberTIL.setEndIconOnClickListener { scanCode() }
+
+        numberET.addTextChangedListener(numberWatcher)
 
         storeDropdownInit()
         typeDropdownInit()
@@ -273,5 +279,20 @@ class AddCardActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+    }
+
+    private val numberWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun afterTextChanged(p0: Editable?) {
+            if(cardViewModel.getCardsCountByNumber(p0.toString())>0)
+                numberTIL.helperText = getString(R.string.card_exists)
+            else
+                numberTIL.isHelperTextEnabled = false
+        }
     }
 }

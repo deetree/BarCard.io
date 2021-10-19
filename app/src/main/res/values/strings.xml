@@ -18,4 +18,5 @@
     <string name="add_card">Add card</string>
     <string name="copied">Copied!</string>
     <string name="camera_perm_required">Camera permission required</string>
+    <string name="card_exists">A card with this number already exists</string>
 </resources>
